@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem Statement Training Module</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F0F0F0; /* rotorkLightGrey */
+            color: #6B7B8D; /* rotorkGrey */
+        }
+        .font-serif {
+            font-family: serif;
+        }
+        /* Custom styles for checkboxes and radio buttons */
+        input[type="checkbox"],
+        input[type="radio"] {
+            accent-color: #0073B2; /* rotorkBlue */
+        }
+        /* Ensure consistent bullet point alignment */
+        ul {
+            list-style-type: disc; /* Use default disc bullet */
+            list-style-position: inside; /* Place bullet inside the content flow */
+            padding-left: 1.5rem; /* Overall indentation of the list from the left edge */
+        }
+        li {
+            margin-bottom: 0.5rem; /* Space between list items */
+            text-indent: -1.5em; /* Pull the first line (including bullet) back by the bullet width + some space */
+            padding-left: 1.5em; /* Push the entire content (including wrapped lines) to the right */
+        }
+        /* Ensure strong tag within li doesn't cause extra indentation */
+        li strong {
+            display: inline; /* Keep strong tag inline */
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen">
+        <div class="container mx-auto p-8 max-w-4xl bg-white shadow-lg rounded-lg my-10">
+            <div class="flex justify-center mb-8">
+                <img
+                    src="download (5).png"
+                    alt="Rotork Logo"
+                    class="h-12 object-contain"
+                    onerror="this.onerror=null; this.src='https://placehold.co/150x50/FFFFFF/000000?text=Rotork';"
+                />
+            </div>
+            <div id="content-area">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // Define Rotork colors (approximations from CMYK values)
+        const colors = {
+            rotorkRed: '#E60026',
+            rotorkDarkBlue: '#004D73',
+            rotorkBlue: '#0073B2',
+            rotorkYellow: '#FFCC00',
+            rotorkTeal: '#00B2B2',
+            rotorkPurple: '#8F4FBF',
+            rotorkOrange: '#FF8000',
+            rotorkLightBlue: '#66CCFF',
+            rotorkPink: '#FF66CC',
+            rotorkGreen: '#669933',
+            rotorkGrey: '#6B7B8D',
+            rotorkLightGrey: '#F0F0F0',
+        };
+
+        // State variables (global for simplicity in plain JS app)
+        let currentSection = 'intro';
+        let scenarioAnswers = {
+            what: '',
+            where: '',
+            who: '',
+            when: '',
+            why: '',
+            how: '',
+        };
+        let quizAnswers = {};
+        let quizSubmitted = false;
+        let score = 0;
+        let certificateName = '';
+        let showCertificateInput = false;
+
+        // Quiz questions with correct answers
+        const quizQuestions = [
+            {
+                id: 1,
+                question: "What is the primary purpose of a well-defined problem statement?",
+                options: [
+                    "To assign blame for issues.",
+                    "To clearly articulate a business challenge and its impact.",
+                    "To list all possible solutions.",
+                    "To document past failures."
+                ],
+                correctAnswer: "To clearly articulate a business challenge and its impact."
+            },
+            {
+                id: 2,
+                question: "Which part of the 5 W's and 1 H focuses on the impact or consequences of the problem?",
+                options: [
+                    "What",
+                    "Where",
+                    "Why",
+                    "Who"
+                ],
+                correctAnswer: "Why"
+            },
+            {
+                id: 3,
+                question: "The 'Problem Ladder' concept helps in:",
+                options: [
+                    "Climbing the corporate hierarchy.",
+                    "Breaking down a large problem into smaller, manageable components.",
+                    "Identifying the most senior person affected by a problem.",
+                    "Ranking problems by their severity."
+                ],
+                correctAnswer: "Breaking down a large problem into smaller, manageable components."
+            },
+            {
+                id: 4,
+                question: "If you cannot effectively answer the 5 W's and 1 H for a problem, what might be a likely consequence?",
+                options: [
+                    "The problem will magically resolve itself.",
+                    "Solutions developed may not address the root cause.",
+                    "You will automatically get a promotion.",
+                    "No one will notice the problem."
+                ],
+                correctAnswer: "Solutions developed may not address the root cause."
+            },
+            {
+                id: 5,
+                question: "In a problem statement, 'Who is affected?' refers to:",
+                options: [
+                    "Only the direct customers.",
+                    "Only the employees responsible for the problem.",
+                    "All stakeholders, including customers, employees, and the business.",
+                    "All stakeholders, including customers, employees, and the business."
+                ],
+                correctAnswer: "All stakeholders, including customers, employees, and the business."
+            },
+            {
+                id: 6,
+                question: "'What is the data?' in a problem statement helps in:",
+                options: [
+                    "Guessing the problem's severity.",
+                    "Providing objective evidence and quantifying the problem.",
+                    "Ignoring anecdotal evidence.",
+                    "Creating more confusion."
+                ],
+                correctAnswer: "Providing objective evidence and quantifying the problem."
+            },
+            {
+                id: 7,
+                question: "A well-defined problem statement should ideally be:",
+                options: [
+                    "Vague and open to interpretation.",
+                    "Long and highly technical.",
+                    "Clear, concise, and measurable.",
+                    "Focused on assigning blame."
+                ],
+                correctAnswer: "Clear, concise, and measurable."
+            },
+            {
+                id: 8,
+                question: "Why is it important to identify 'When' a problem occurs?",
+                options: [
+                    "To know when to take a coffee break.",
+                    "To understand patterns, triggers, and potential peak times.",
+                    "It's not important for problem-solving.",
+                    "To set a deadline for solving the problem."
+                ],
+                correctAnswer: "To understand patterns, triggers, and potential peak times."
+            },
+            {
+                id: 9,
+                question: "'How is it a problem?' describes:",
+                options: [
+                    "The emotional response to the problem.",
+                    "The step-by-step process or mechanism through which the problem manifests.",
+                    "How difficult it is to solve the problem.",
+                    "How many people are complaining."
+                ],
+                correctAnswer: "The step-by-step process or mechanism through which the problem manifests."
+            },
+            {
+                id: 10,
+                question: "What is a key benefit of a clear problem statement for a business?",
+                options: [
+                    "It guarantees immediate profit.",
+                    "It ensures all employees agree on everything.",
+                    "It aligns teams, prioritizes efforts, and guides solution development.",
+                    "It eliminates the need for further analysis."
+                ],
+                correctAnswer: "It aligns teams, prioritizes efforts, and guides solution development."
+            }
+        ];
+
+        // Helper function to create DOM elements with styles
+        function createElement(tag, classes = [], styles = {}, textContent = '') {
+            const element = document.createElement(tag);
+            if (classes.length > 0) {
+                element.className = classes.join(' ');
+            }
+            for (const style in styles) {
+                element.style[style] = styles[style];
+            }
+            if (textContent) {
+                element.textContent = textContent;
+            }
+            return element;
+        }
+
+        // --- Interactive Components (Converted from React) ---
+
+        // DragDropInteractive
+        function renderDragDropInteractive(container, sectionId, prompt, items, correctItems, explanation) {
+            let availableItems = [...items];
+            let selectedItems = [];
+            let feedback = null;
+            let showExplanation = false;
+
+            const render = () => {
+                container.innerHTML = ''; // Clear previous content
+
+                const wrapper = createElement('div', ['p-6', 'rounded-lg', 'shadow-inner', 'mt-6'], {
+                    backgroundColor: colors.rotorkLightGrey,
+                    borderLeft: `4px solid ${colors.rotorkBlue}`
+                });
+
+                const h3 = createElement('h3', ['text-xl', 'font-semibold', 'mb-4'], { color: colors.rotorkDarkBlue }, 'Interactive Exercise:');
+                const pPrompt = createElement('p', ['mb-4'], { color: colors.rotorkGrey }, prompt);
+                wrapper.appendChild(h3);
+                wrapper.appendChild(pPrompt);
+
+                const flexContainer = createElement('div', ['flex', 'flex-col', 'md:flex-row', 'gap-6']);
+
+                // Available Items
+                const availableDiv = createElement('div', ['flex-1', 'p-4', 'rounded-md', 'border'], { borderColor: colors.rotorkGrey });
+                const h4Available = createElement('h4', ['font-semibold', 'mb-3'], { color: colors.rotorkDarkBlue }, 'Available Options:');
+                const availableSpace = createElement('div', ['space-y-2']);
+                availableDiv.appendChild(h4Available);
+                availableDiv.appendChild(availableSpace);
+
+                if (availableItems.length === 0) {
+                    availableSpace.appendChild(createElement('p', ['text-sm'], { color: colors.rotorkGrey }, 'No more options to select.'));
+                } else {
+                    availableItems.forEach(item => {
+                        const itemDiv = createElement('div', ['p-2', 'rounded-md', 'cursor-pointer', 'transition', 'duration-200', 'ease-in-out'], {
+                            backgroundColor: colors.rotorkLightBlue + '40',
+                            color: colors.rotorkDarkBlue,
+                            border: `1px solid ${colors.rotorkBlue}`
+                        }, item);
+                        if (feedback === null) { // Only allow selection if no feedback yet
+                            itemDiv.onclick = () => {
+                                handleSelect(item);
+                                render(); // Re-render to update state
+                            };
+                        }
+                        availableSpace.appendChild(itemDiv);
+                    });
+                }
+                flexContainer.appendChild(availableDiv);
+
+                // Selected Items
+                const selectedDiv = createElement('div', ['flex-1', 'p-4', 'rounded-md', 'border'], { borderColor: colors.rotorkGrey });
+                const h4Selected = createElement('h4', ['font-semibold', 'mb-3'], { color: colors.rotorkDarkBlue }, 'Your Selected Answers:');
+                const selectedSpace = createElement('div', ['space-y-2']);
+                selectedDiv.appendChild(h4Selected);
+                selectedDiv.appendChild(selectedSpace);
+
+                if (selectedItems.length === 0) {
+                    selectedSpace.appendChild(createElement('p', ['text-sm'], { color: colors.rotorkGrey }, 'Click options on the left to add them here.'));
+                } else {
+                    selectedItems.forEach(item => {
+                        const itemDiv = createElement('div', ['p-2', 'rounded-md', 'cursor-pointer', 'transition', 'duration-200', 'ease-in-out'], {
+                            backgroundColor: colors.rotorkBlue + '40',
+                            color: colors.rotorkDarkBlue,
+                            border: `1px solid ${colors.rotorkBlue}`
+                        }, item);
+                        if (feedback === null) { // Only allow deselection if no feedback yet
+                            itemDiv.onclick = () => {
+                                handleDeselect(item);
+                                render(); // Re-render to update state
+                            };
+                        }
+                        selectedSpace.appendChild(itemDiv);
+                    });
+                }
+                flexContainer.appendChild(selectedDiv);
+                wrapper.appendChild(flexContainer);
+
+                const checkBtn = createElement('button', ['mt-6', 'px-6', 'py-3', 'text-white', 'font-semibold', 'rounded-lg', 'shadow-md', 'transition', 'duration-300', 'ease-in-out', 'transform', 'hover:scale-105'], {
+                    backgroundColor: colors.rotorkRed
+                }, 'Check Answer');
+                checkBtn.onclick = () => {
+                    checkAnswer();
+                    render(); // Re-render to show feedback
+                };
+                if (feedback !== null) {
+                    checkBtn.disabled = true;
+                    checkBtn.style.opacity = '0.5';
+                    checkBtn.style.cursor = 'not-allowed';
+                }
+                wrapper.appendChild(checkBtn);
+
+                if (feedback) {
+                    const feedbackP = createElement('p', ['mt-4', 'text-lg', 'font-semibold'], {
+                        color: feedback === 'correct' ? '#10B981' : '#EF4444' // Tailwind green-600 / red-600
+                    }, feedback === 'correct' ? '✅ Correct! Well done.' : '❌ Incorrect. Review the content and try again.');
+                    wrapper.appendChild(feedbackP);
+                }
+
+                if (showExplanation && explanation) {
+                    const explanationDiv = createElement('div', ['mt-4', 'p-4', 'rounded-md'], {
+                        backgroundColor: colors.rotorkLightBlue + '1A',
+                        border: `1px solid ${colors.rotorkBlue}`
+                    });
+                    explanationDiv.appendChild(createElement('h4', ['font-semibold', 'mb-2'], { color: colors.rotorkDarkBlue }, 'Explanation:'));
+                    explanationDiv.appendChild(createElement('p', [], { color: colors.rotorkGrey }, explanation));
+                    wrapper.appendChild(explanationDiv);
+                }
+
+                container.appendChild(wrapper);
+            };
+
+            const handleSelect = (itemToSelect) => {
+                if (feedback) return;
+                selectedItems.push(itemToSelect);
+                availableItems = availableItems.filter(item => item !== itemToSelect);
+            };
+
+            const handleDeselect = (itemToDeselect) => {
+                if (feedback) return;
+                availableItems.push(itemToDeselect);
+                availableItems.sort(); // Keep available sorted
+                selectedItems = selectedItems.filter(item => item !== itemToDeselect);
+            };
+
+            const checkAnswer = () => {
+                const sortedSelected = [...selectedItems].sort();
+                const sortedCorrect = [...correctItems].sort();
+
+                const isCorrect = sortedSelected.length === sortedCorrect.length &&
+                                 sortedSelected.every((value, index) => value === sortedCorrect[index]);
+
+                feedback = isCorrect ? 'correct' : 'incorrect';
+                showExplanation = true;
+                // No direct onAnswer callback here, as state is managed locally for this component
+            };
+
+            render(); // Initial render
+        }
+
+        // MultipleChoiceInteractive
+        function renderMultipleChoiceInteractive(container, sectionId, prompt, options, correctAnswer, explanation) {
+            let selectedOption = null;
+            let feedback = null;
+            let showExplanation = false;
+
+            const render = () => {
+                container.innerHTML = '';
+
+                const wrapper = createElement('div', ['p-6', 'rounded-lg', 'shadow-inner', 'mt-6'], {
+                    backgroundColor: colors.rotorkLightGrey,
+                    borderLeft: `4px solid ${colors.rotorkBlue}`
+                });
+
+                const h3 = createElement('h3', ['text-xl', 'font-semibold', 'mb-4'], { color: colors.rotorkDarkBlue }, 'Interactive Exercise:');
+                const pPrompt = createElement('p', ['mb-4'], { color: colors.rotorkGrey }, prompt);
+                wrapper.appendChild(h3);
+                wrapper.appendChild(pPrompt);
+
+                const optionsDiv = createElement('div', ['space-y-3']);
+                options.forEach(option => {
+                    const label = createElement('label', ['flex', 'items-center', 'cursor-pointer'], { color: colors.rotorkGrey });
+                    const input = createElement('input', ['form-radio', 'h-5', 'w-5'], { accentColor: colors.rotorkBlue });
+                    input.type = 'radio';
+                    input.name = sectionId;
+                    input.value = option;
+                    input.checked = selectedOption === option;
+                    input.disabled = feedback !== null;
+                    input.onchange = (e) => {
+                        selectedOption = e.target.value;
+                        render();
+                    };
+                    label.appendChild(input);
+                    label.appendChild(createElement('span', ['ml-3', 'text-base'], {}, option));
+                    optionsDiv.appendChild(label);
+                });
+                wrapper.appendChild(optionsDiv);
+
+                const checkBtn = createElement('button', ['mt-6', 'px-6', 'py-3', 'text-white', 'font-semibold', 'rounded-lg', 'shadow-md', 'transition', 'duration-300', 'ease-in-out', 'transform', 'hover:scale-105'], {
+                    backgroundColor: colors.rotorkRed
+                }, 'Check Answer');
+                checkBtn.onclick = () => {
+                    checkAnswer();
+                    render();
+                };
+                if (selectedOption === null || feedback !== null) {
+                    checkBtn.disabled = true;
+                    checkBtn.style.opacity = '0.5';
+                    checkBtn.style.cursor = 'not-allowed';
+                }
+                wrapper.appendChild(checkBtn);
+
+                if (feedback) {
+                    const feedbackP = createElement('p', ['mt-4', 'text-lg', 'font-semibold'], {
+                        color: feedback === 'correct' ? '#10B981' : '#EF4444'
+                    }, feedback === 'correct' ? '✅ Correct! Well done.' : '❌ Incorrect. Try again!');
+                    wrapper.appendChild(feedbackP);
+                }
+
+                if (showExplanation && explanation) {
+                    const explanationDiv = createElement('div', ['mt-4', 'p-4', 'rounded-md'], {
+                        backgroundColor: colors.rotorkLightBlue + '1A',
+                        border: `1px solid ${colors.rotorkBlue}`
+                    });
+                    explanationDiv.appendChild(createElement('h4', ['font-semibold', 'mb-2'], { color: colors.rotorkDarkBlue }, 'Explanation:'));
+                    explanationDiv.appendChild(createElement('p', [], { color: colors.rotorkGrey }, explanation));
+                    wrapper.appendChild(explanationDiv);
+                }
+
+                container.appendChild(wrapper);
+            };
+
+            const checkAnswer = () => {
+                const isCorrect = selectedOption === correctAnswer;
+                feedback = isCorrect ? 'correct' : 'incorrect';
+                showExplanation = true;
+            };
+
+            render();
+        }
+
+        // SelectAllThatApplyInteractive
+        function renderSelectAllThatApplyInteractive(container, sectionId, prompt, options, correctAnswers, explanation) {
+            let selectedOptions = [];
+            let feedback = null;
+            let showExplanation = false;
+
+            const render = () => {
+                container.innerHTML = '';
+
+                const wrapper = createElement('div', ['p-6', 'rounded-lg', 'shadow-inner', 'mt-6'], {
+                    backgroundColor: colors.rotorkLightGrey,
+                    borderLeft: `4px solid ${colors.rotorkBlue}`
+                });
+
+                const h3 = createElement('h3', ['text-xl', 'font-semibold', 'mb-4'], { color: colors.rotorkDarkBlue }, 'Interactive Exercise:');
+                const pPrompt = createElement('p', ['mb-4'], { color: colors.rotorkGrey }, prompt);
+                wrapper.appendChild(h3);
+                wrapper.appendChild(pPrompt);
+
+                const optionsDiv = createElement('div', ['space-y-3']);
+                options.forEach(option => {
+                    const label = createElement('label', ['flex', 'items-center', 'cursor-pointer'], { color: colors.rotorkGrey });
+                    const input = createElement('input', ['form-checkbox', 'h-5', 'w-5', 'rounded'], { accentColor: colors.rotorkBlue });
+                    input.type = 'checkbox';
+                    input.name = sectionId;
+                    input.value = option;
+                    input.checked = selectedOptions.includes(option);
+                    input.disabled = feedback !== null;
+                    input.onchange = (e) => {
+                        if (e.target.checked) {
+                            selectedOptions.push(e.target.value);
+                        } else {
+                            selectedOptions = selectedOptions.filter(item => item !== e.target.value);
+                        }
+                        render();
+                    };
+                    label.appendChild(input);
+                    label.appendChild(createElement('span', ['ml-3', 'text-base'], {}, option));
+                    optionsDiv.appendChild(label);
+                });
+                wrapper.appendChild(optionsDiv);
+
+                const checkBtn = createElement('button', ['mt-6', 'px-6', 'py-3', 'text-white', 'font-semibold', 'rounded-lg', 'shadow-md', 'transition', 'duration-300', 'ease-in-out', 'transform', 'hover:scale-105'], {
+                    backgroundColor: colors.rotorkRed
+                }, 'Check Answer');
+                checkBtn.onclick = () => {
+                    checkAnswer();
+                    render();
+                };
+                if (selectedOptions.length === 0 || feedback !== null) {
+                    checkBtn.disabled = true;
+                    checkBtn.style.opacity = '0.5';
+                    checkBtn.style.cursor = 'not-allowed';
+                }
+                wrapper.appendChild(checkBtn);
+
+                if (feedback) {
+                    const feedbackP = createElement('p', ['mt-4', 'text-lg', 'font-semibold'], {
+                        color: feedback === 'correct' ? '#10B981' : '#EF4444'
+                    }, feedback === 'correct' ? '✅ Correct! Well done.' : '❌ Incorrect. Review the content and try again.');
+                    wrapper.appendChild(feedbackP);
+                }
+
+                if (showExplanation && explanation) {
+                    const explanationDiv = createElement('div', ['mt-4', 'p-4', 'rounded-md'], {
+                        backgroundColor: colors.rotorkLightBlue + '1A',
+                        border: `1px solid ${colors.rotorkBlue}`
+                    });
+                    explanationDiv.appendChild(createElement('h4', ['font-semibold', 'mb-2'], { color: colors.rotorkDarkBlue }, 'Explanation:'));
+                    explanationDiv.appendChild(createElement('p', [], { color: colors.rotorkGrey }, explanation));
+                    wrapper.appendChild(explanationDiv);
+                }
+
+                container.appendChild(wrapper);
+            };
+
+            const checkAnswer = () => {
+                const sortedSelected = [...selectedOptions].sort();
+                const sortedCorrect = [...correctAnswers].sort();
+
+                const isCorrect = sortedSelected.length === sortedCorrect.length &&
+                                 sortedSelected.every((value, index) => value === sortedCorrect[index]);
+
+                feedback = isCorrect ? 'correct' : 'incorrect';
+                showExplanation = true;
+            };
+
+            render();
+        }
+
+        // TextInputInteractive
+        function renderTextInputInteractive(container, sectionId, prompt, correctKeywords, explanation) {
+            let inputValue = '';
+            let feedback = null;
+            let showExplanation = false;
+
+            const render = () => {
+                container.innerHTML = '';
+
+                const wrapper = createElement('div', ['p-6', 'rounded-lg', 'shadow-inner', 'mt-6'], {
+                    backgroundColor: colors.rotorkLightGrey,
+                    borderLeft: `4px solid ${colors.rotorkBlue}`
+                });
+
+                const h3 = createElement('h3', ['text-xl', 'font-semibold', 'mb-4'], { color: colors.rotorkDarkBlue }, 'Interactive Exercise:');
+                const pPrompt = createElement('p', ['mb-4'], { color: colors.rotorkGrey }, prompt);
+                wrapper.appendChild(h3);
+                wrapper.appendChild(pPrompt);
+
+                const textarea = createElement('textarea', ['mt-1', 'block', 'w-full', 'px-4', 'py-2', 'border', 'rounded-md', 'shadow-sm', 'sm:text-sm', 'resize-y'], {
+                    borderColor: colors.rotorkGrey,
+                    color: colors.rotorkGrey
+                });
+                textarea.rows = 3;
+                textarea.placeholder = "Type your answer here...";
+                textarea.value = inputValue;
+                textarea.disabled = feedback !== null;
+                textarea.oninput = (e) => {
+                    inputValue = e.target.value;
+                    render(); // Re-render to update button disabled state
+                };
+                wrapper.appendChild(textarea);
+
+                const checkBtn = createElement('button', ['mt-6', 'px-6', 'py-3', 'text-white', 'font-semibold', 'rounded-lg', 'shadow-md', 'transition', 'duration-300', 'ease-in-out', 'transform', 'hover:scale-105'], {
+                    backgroundColor: colors.rotorkRed
+                }, 'Check Answer');
+                checkBtn.onclick = () => {
+                    checkAnswer();
+                    render();
+                };
+                if (inputValue.trim() === '' || feedback !== null) {
+                    checkBtn.disabled = true;
+                    checkBtn.style.opacity = '0.5';
+                    checkBtn.style.cursor = 'not-allowed';
+                }
+                wrapper.appendChild(checkBtn);
+
+                if (feedback) {
+                    const feedbackP = createElement('p', ['mt-4', 'text-lg', 'font-semibold'], {
+                        color: feedback === 'correct' ? '#10B981' : '#EF4444'
+                    }, feedback === 'correct' ? '✅ Correct! Well done.' : '❌ Incorrect. Review the content and try again.');
+                    wrapper.appendChild(feedbackP);
+                }
+
+                if (showExplanation && explanation) {
+                    const explanationDiv = createElement('div', ['mt-4', 'p-4', 'rounded-md'], {
+                        backgroundColor: colors.rotorkLightBlue + '1A',
+                        border: `1px solid ${colors.rotorkBlue}`
+                    });
+                    explanationDiv.appendChild(createElement('h4', ['font-semibold', 'mb-2'], { color: colors.rotorkDarkBlue }, 'Explanation:'));
+                    explanationDiv.appendChild(createElement('p', [], { color: colors.rotorkGrey }, explanation));
+                    wrapper.appendChild(explanationDiv);
+                }
+
+                container.appendChild(wrapper);
+            };
+
+            const checkAnswer = () => {
+                const lowerCaseInput = inputValue.toLowerCase();
+                const isCorrect = correctKeywords.some(keyword => lowerCaseInput.includes(keyword.toLowerCase()));
+                feedback = isCorrect ? 'correct' : 'incorrect';
+                showExplanation = true;
+            };
+
+            render();
+        }
+
+        // --- Navigation and Section Rendering ---
+
+        function navigateTo(section) {
+            currentSection = section;
+            renderSection();
+            window.scrollTo(0, 0); // Scroll to top
+        }
+
+        function handleScenarioChange(e) {
+            scenarioAnswers[e.target.name] = e.target.value;
+        }
+
+        function handleQuizChange(e) {
+            quizAnswers[e.target.name] = e.target.value;
+        }
+
+        function handleSubmitQuiz() {
+            let correctCount = 0;
+            quizQuestions.forEach(q => {
+                if (quizAnswers[q.id] === q.correctAnswer) {
+                    correctCount++;
+                }
+            });
+            score = correctCount;
+            quizSubmitted = true;
+            if (score / quizQuestions.length >= 0.8) {
+                showCertificateInput = true;
+            }
+            renderSection(); // Re-render to show quiz results
+        }
+
+        function renderSection() {
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = ''; // Clear previous content
+
+            let sectionContent;
+
+            switch (currentSection) {
+                case 'intro':
+                    sectionContent = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Welcome to the Problem Statement Training Module!</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Understanding and clearly defining a problem is the crucial first step towards finding effective solutions. This module will guide you through the essential concepts and tools for crafting impactful problem statements.
+                            </p>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                By the end of this module, you'll be equipped to identify, analyze, and articulate problems in a way that drives meaningful action.
+                            </p>
+                            <button onclick="navigateTo('importance')" class="mt-6 px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                Start Module
+                            </button>
+                        </div>
+                    `;
+                    contentArea.innerHTML = sectionContent;
+                    break;
+
+                case 'importance':
+                    sectionContent = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Why Problem Statements Are Important</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                A problem statement is a concise description of an issue that needs to be addressed. It clearly articulates the gap between the current state and the desired state, without suggesting a solution. It defines the problem, its impact, and who is affected, serving as a foundation for problem-solving efforts.
+                            </p>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                A well-crafted problem statement acts as a compass, guiding all subsequent efforts in problem-solving. Without it, you risk:
+                            </p>
+                            <ul class="list-disc text-lg" style="color: ${colors.rotorkGrey}; margin-left: 1.5rem;">
+                                <li><strong>Misunderstanding the Root Cause:</strong> Leading to superficial solutions that don't address the core issue.</li>
+                                <li><strong>Wasted Resources:</strong> Investing time, money, and effort into solving the wrong problem.</li>
+                                <li><strong>Lack of Alignment:</strong> Teams working on different interpretations of the problem, leading to inefficiency.</li>
+                                <li><strong>Difficulty in Measuring Success:</strong> Without a clear problem, it's hard to define what a successful solution looks like.</li>
+                                <li><strong>Delayed Progress:</strong> Constant rework and redirection due to an unclear starting point.</li>
+                            </ul>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                A strong problem statement ensures everyone is on the same page, focused on the real challenge, and working towards a shared objective.
+                            </p>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('intro')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('problem-ladder')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: The Problem Ladder
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    contentArea.innerHTML = sectionContent;
+                    break;
+
+                case 'problem-ladder':
+                    const ladderSteps = [
+                        { label: "HOW is it a Problem?", color: colors.rotorkPurple },
+                        { label: "WHY is it a Problem?", color: colors.rotorkOrange },
+                        { label: "WHEN Does the Problem Occur?", color: colors.rotorkTeal },
+                        { label: "WHO is Affected?", color: colors.rotorkBlue },
+                        { label: "WHERE is the Problem?", color: colors.rotorkYellow },
+                        { label: "WHAT is the Problem?", color: colors.rotorkRed },
+                    ];
+                    sectionContent = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">The Concept of the Problem Ladder</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                The Problem Ladder is a conceptual tool designed to help you build an effective problem statement by starting at the foundational level and working your way up. You begin by defining "WHAT" the problem is, and then progressively answer the other 5 W's and 1 H, ascending the ladder to a comprehensive understanding.
+                            </p>
+
+                            <div class="flex justify-center my-8">
+                                <div class="relative flex flex-col items-center py-4 px-2 bg-gray-200 rounded-lg shadow-xl" style="width: 250px; height: ${ladderSteps.length * 55 + 80}px; background-color: ${colors.rotorkLightGrey};">
+                                    <div class="absolute left-2 top-0 bottom-0 w-3 rounded-full" style="background-color: ${colors.rotorkGrey};"></div>
+                                    <div class="absolute right-2 top-0 bottom-0 w-3 rounded-full" style="background-color: ${colors.rotorkGrey};"></div>
+
+                                    <div class="absolute top-4 flex items-center justify-center w-56 h-12 text-white font-bold text-base rounded-lg shadow-md z-10"
+                                        style="background: linear-gradient(to right, ${colors.rotorkBlue}, ${colors.rotorkDarkBlue});">
+                                        Effective Problem Statement
+                                    </div>
+                                    ${ladderSteps.map((step, index) => `
+                                        <div
+                                            class="absolute flex items-center justify-center w-56 h-10 text-white font-semibold rounded-md shadow-sm z-10"
+                                            style="bottom: ${20 + (ladderSteps.length - 1 - index) * 55}px; background-color: ${step.color};"
+                                        >
+                                            ${step.label}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Each step on the ladder represents a crucial question that, when answered, builds a more complete and actionable problem statement. By systematically addressing these elements, you ensure a thorough understanding of the problem before seeking solutions.
+                            </p>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('importance')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('what-is-problem')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: What is the Problem?
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    contentArea.innerHTML = sectionContent;
+                    break;
+
+                case 'what-is-problem':
+                    const whatItems = [
+                        "Low customer satisfaction scores",
+                        "Team morale is low",
+                        "Project deadlines are consistently missed",
+                        "We need more budget for marketing",
+                        "Lack of clear communication on project goals",
+                        "Outdated software causing frequent crashes"
+                    ];
+                    const whatCorrectItems = [
+                        "Low customer satisfaction scores",
+                        "Project deadlines are consistently missed",
+                        "Lack of clear communication on project goals",
+                        "Outdated software causing frequent crashes"
+                    ];
+                    const whatExplanation = `
+                        'What is the Problem?' focuses on observable, concrete issues.
+                        "Low customer satisfaction scores," "Project deadlines are consistently missed," "Lack of clear communication on project goals," and "Outdated software causing frequent crashes" are all specific, observable problems.
+                        "Team morale is low" is more of a symptom or impact.
+                        "We need more budget for marketing" is a potential solution or resource need, not the problem itself.
+                    `;
+                    contentArea.innerHTML = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">What is the Problem?</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                This is the foundational element of your problem statement. It requires a precise, objective, and observable description of the issue. Focus on the facts and avoid jumping to conclusions or solutions. What exactly is going wrong? What is the current undesirable situation? Be specific and quantifiable where possible. For example, instead of "sales are bad," specify "sales have decreased by 15% in Q1."
+                            </p>
+                            <div id="what-interactive-container"></div>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('problem-ladder')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('where-is-problem')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: Where is the Problem?
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    renderDragDropInteractive(document.getElementById('what-interactive-container'), 'what-is-problem', "Select the statements that best describe 'What is the Problem?' (observable issues):", whatItems, whatCorrectItems, whatExplanation);
+                    break;
+
+                case 'where-is-problem':
+                    const whereQuestion = {
+                        prompt: "A company is experiencing high customer call volumes related to billing errors. Where is the most likely 'Where' for this problem?",
+                        options: [
+                            "The marketing department.",
+                            "The billing system or customer service department.",
+                            "The product development team.",
+                            "The company cafeteria."
+                        ],
+                        correctAnswer: "The billing system or customer service department.",
+                        explanation: `
+                            'Where is the Problem?' helps pinpoint the specific location or context.
+                            The problem of billing errors and high call volumes directly points to the "billing system" where errors originate, and the "customer service department" where calls are received. Other departments are less directly involved in this specific problem.
+                        `
+                    };
+                    contentArea.innerHTML = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Where is the Problem?</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Pinpointing the location or specific context of the problem helps narrow down the scope and identify potential areas for investigation. This could be a department, a system, a product line, or a geographical region. It prevents you from trying to solve a global problem when it's actually localized.
+                            </p>
+                            <div id="where-interactive-container"></div>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('what-is-problem')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('who-is-affected')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: Who is Affected?
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    renderMultipleChoiceInteractive(document.getElementById('where-interactive-container'), 'where-is-problem', whereQuestion.prompt, whereQuestion.options, whereQuestion.correctAnswer, whereQuestion.explanation);
+                    break;
+
+                case 'who-is-affected':
+                    const whoOptions = [
+                        "End Customers",
+                        "Internal Sales Team",
+                        "IT Support Staff",
+                        "Company Shareholders",
+                        "Delivery Drivers",
+                        "Office Plants",
+                        "Competitors' employees"
+                    ];
+                    const whoCorrectAnswers = [
+                        "End Customers",
+                        "Internal Sales Team",
+                        "IT Support Staff",
+                        "Company Shareholders",
+                        "Delivery Drivers"
+                    ];
+                    const whoExplanation = `
+                        'Who is Affected?' includes all individuals or groups impacted by the problem.
+                        "End Customers," "Internal Sales Team," "IT Support Staff," "Company Shareholders," and "Delivery Drivers" are all direct or indirect stakeholders who would feel the consequences of a business problem.
+                        "Office Plants" are not sentient and "Competitors' employees" are not stakeholders of your company's internal problems.
+                    `;
+                    contentArea.innerHTML = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Who is Affected?</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Understanding "Who" is affected by the problem is crucial for building empathy and ensuring your solution addresses the needs of all relevant stakeholders. This includes direct users, customers, employees (across various departments), management, partners, and even the broader business or community. Consider both those directly experiencing the problem and those impacted by its ripple effects.
+                            </p>
+                            <div id="who-interactive-container"></div>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('where-is-problem')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('when-does-problem-occur')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: When Does the Problem Occur?
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    renderSelectAllThatApplyInteractive(document.getElementById('who-interactive-container'), 'who-is-affected', "Select all the groups or individuals who could be affected by a business problem:", whoOptions, whoCorrectAnswers, whoExplanation);
+                    break;
+
+                case 'when-does-problem-occur':
+                    const whenKeywords = ["peak", "seasonal", "after", "during", "specific events", "intermittent", "consistently", "time", "frequency", "trigger"];
+                    const whenExplanation = `
+                        'When Does the Problem Occur?' helps identify patterns, triggers, and frequency.
+                        Your answer should describe a timeframe, frequency, or trigger for the problem. Examples include: "During peak holiday season," "After every software update," "Only on Monday mornings," "Constantly throughout the day," "During system downtime for maintenance," or "When new employees are onboarded."
+                    `;
+                    contentArea.innerHTML = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">When Does the Problem Occur?</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Understanding the timing or frequency of the problem helps reveal patterns, triggers, and potential peak periods. Is it a constant issue, or does it occur intermittently? Is it seasonal, tied to specific events (like system updates or marketing campaigns), or does it happen at particular times of day or week? Identifying the timing can provide critical clues about root causes and potential intervention points.
+                            </p>
+                            <div id="when-interactive-container"></div>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('who-is-affected')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('why-is-problem')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: Why is it a Problem?
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    renderTextInputInteractive(document.getElementById('when-interactive-container'), 'when-does-problem-occur', "Describe a scenario where 'When' a problem occurs. For example, 'During peak hours' or 'After system updates'.", whenKeywords, whenExplanation);
+                    break;
+
+                case 'why-is-problem':
+                    const whyItems = [
+                        "Loss of revenue",
+                        "Decreased customer loyalty",
+                        "Increased operational costs",
+                        "Improved employee morale",
+                        "Damaged brand reputation",
+                        "Faster coffee machine",
+                        "Reduced market share",
+                        "Compliance risks"
+                    ];
+                    const whyCorrectItems = [
+                        "Loss of revenue",
+                        "Decreased customer loyalty",
+                        "Increased operational costs",
+                        "Damaged brand reputation",
+                        "Reduced market share",
+                        "Compliance risks"
+                    ];
+                    const whyExplanation = `
+                        'Why is it a Problem?' focuses on the negative impacts or consequences.
+                        "Loss of revenue," "Decreased customer loyalty," "Increased operational costs," "Damaged brand reputation," "Reduced market share," and "Compliance risks" are all direct negative impacts on the business or customer.
+                        "Improved employee morale" is a positive outcome, not a problem impact.
+                        "Faster coffee machine" is irrelevant to business problem impacts.
+                    `;
+                    contentArea.innerHTML = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Why is it a Problem (to business or customer)?</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                This section quantifies the impact and articulates the negative consequences if the problem is not solved. Why does this problem matter? What are the tangible and intangible costs to the business or the customer? Think about financial losses, decreased productivity, damaged reputation, reduced customer satisfaction, missed opportunities, increased risk, or negative environmental/social impact. This helps justify the need for a solution.
+                            </p>
+                            <div id="why-interactive-container"></div>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('when-does-problem-occur')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('how-is-problem')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: How is it a Problem?
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    renderDragDropInteractive(document.getElementById('why-interactive-container'), 'why-is-problem', "Select the actual negative impacts or consequences of a problem:", whyItems, whyCorrectItems, whyExplanation);
+                    break;
+
+                case 'how-is-problem':
+                    const howQuestion = {
+                        prompt: "Which of the following best describes 'How is it a Problem?' and includes relevant data?",
+                        options: [
+                            "Our team feels stressed.",
+                            "The inefficient manual approval process, evidenced by a 30% increase in processing time, leads to project delays.",
+                            "We need a new software system.",
+                            "Customers are complaining a lot."
+                        ],
+                        correctAnswer: "The inefficient manual approval process, evidenced by a 30% increase in processing time, leads to project delays.",
+                        explanation: `
+                            'How is it a Problem?' describes the mechanism or process, often supported by data.
+                            The correct answer details a specific process ("inefficient manual approval process"), provides data ("30% increase in processing time"), and links it to the outcome ("project delays").
+                            Other options are either symptoms, solutions, or too vague.
+                        `
+                    };
+                    contentArea.innerHTML = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">How is it a Problem?</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                This delves into the mechanism or process through which the problem manifests. It describes the chain of events, the specific steps, or the underlying conditions that cause the problem to occur and lead to its impact. It's about understanding the "how-it-works" of the problem. This section also incorporates "What is the Data?", referring to the objective evidence that validates the existence and quantifies the impact. Data makes your problem statement credible and measurable.
+                            </p>
+                            <div id="how-interactive-container"></div>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('why-is-problem')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('cant-answer-questions')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: Can't Answer Questions?
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    renderMultipleChoiceInteractive(document.getElementById('how-interactive-container'), 'how-is-problem', howQuestion.prompt, howQuestion.options, howQuestion.correctAnswer, howQuestion.explanation);
+                    break;
+
+                case 'cant-answer-questions':
+                    sectionContent = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">What Happens When You Can't Answer the Questions?</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                If you struggle to answer the 5 W's and 1 H, it's a strong indicator that you don't fully understand the problem. This is not a failure, but an opportunity for further investigation. It means you need to gather more information before you can effectively define the problem and seek a solution.
+                            </p>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Consequences of an unclear problem statement include:
+                            </p>
+                            <ul class="list-disc text-lg" style="color: ${colors.rotorkGrey}; margin-left: 1.5rem;">
+                                <li><strong>Ineffective Solutions:</strong> You might solve a symptom, not the root cause, leading to recurring issues.</li>
+                                <li><strong>Scope Creep:</strong> The problem-solving effort expands unnecessarily because the boundaries of the problem are ill-defined.</li>
+                                <li><strong>Lack of Buy-in:</strong> Stakeholders won't commit to a solution if they don't clearly grasp the problem or its importance.</li>
+                                <li><strong>Resource Misallocation:</strong> Time, money, and personnel are spent on initiatives that don't yield meaningful results.</li>
+                                <li><strong>Frustration and Demotivation:</strong> For everyone involved in the process, as efforts may feel aimless or unproductive.</li>
+                                <li><strong>Delayed Progress:</strong> Constant rework, debates, and redirection due to an unclear starting point and shifting objectives.</li>
+                            </ul>
+
+                            <h3 class="text-2xl font-bold mt-8" style="color: ${colors.rotorkDarkBlue};">What You Can Do: Problem-Solving Techniques</h3>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                When faced with an unclear problem, leverage these techniques to gain deeper understanding:
+                            </p>
+                            <ul class="list-disc text-lg" style="color: ${colors.rotorkGrey}; margin-left: 1.5rem;">
+                                <li><strong>5 Whys:</strong> A simple yet powerful technique. Start with the problem and ask "Why?" five times (or as many times as needed) to drill down to the root cause. Each answer forms the basis for the next "Why?" question.</li>
+                                <li><strong>Fishbone Diagram (Ishikawa Diagram):</strong> A visual tool used to explore and identify the potential causes of a problem. It categorizes potential causes into main branches (e.g., People, Process, Equipment, Environment, Materials, Management), allowing for a structured brainstorming of contributing factors.</li>
+                                <li><strong>Mind Mapping:</strong> A visual thinking tool that helps organize information, brainstorm ideas, and explore concepts. For problem statements, you can put the central problem in the middle and branch out with related questions, sub-problems, potential causes, and data points.</li>
+                                <li><strong>Data Gathering & Analysis:</strong> Collect relevant quantitative (metrics, reports) and qualitative (interviews, surveys, observations) data to objectively understand the problem's scope and impact.</li>
+                                <li><strong>Stakeholder Interviews:</strong> Talk to individuals directly affected by or involved with the problem to gain different perspectives and uncover hidden information.</li>
+                            </ul>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                These methods help transform a vague issue into a well-defined problem statement, ready for effective solutioning.
+                            </p>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('how-is-problem')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('scenario-writing')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: Scenario Analysis
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    contentArea.innerHTML = sectionContent;
+                    break;
+
+                case 'scenario-writing':
+                    const scenarioAnswerKeys = ['what', 'where', 'who', 'when', 'why', 'how'];
+                    let scenarioInputsHtml = '';
+                    scenarioAnswerKeys.forEach(key => {
+                        scenarioInputsHtml += `
+                            <div>
+                                <label for="${key}" class="block text-lg font-medium mb-2 capitalize" style="color: ${colors.rotorkGrey};">
+                                    ${key.replace('-', ' ')}:
+                                </label>
+                                <textarea
+                                    id="${key}"
+                                    name="${key}"
+                                    rows="3"
+                                    class="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-y"
+                                    style="border-color: ${colors.rotorkGrey}; color: ${colors.rotorkGrey};"
+                                    placeholder="Enter your answer for ${key.replace('-', ' ')}..."
+                                    oninput="handleScenarioChange(event)"
+                                >${scenarioAnswers[key]}</textarea>
+                            </div>
+                        `;
+                    });
+
+                    sectionContent = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Scenario Analysis: Practice Your Skills!</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Read the following scenario carefully and then use the input boxes below to identify the What, Where, Who, When, Why, and How related to the problem described. Remember to consider any data mentioned as part of the 'How'.
+                            </p>
+                            <div class="p-6 rounded-lg shadow-inner border-l-4" style="background-color: ${colors.rotorkLightGrey}; border-color: ${colors.rotorkBlue};">
+                                <h3 class="text-xl font-semibold" style="color: ${colors.rotorkDarkBlue};">Scenario: E-commerce Website Performance</h3>
+                                <p style="color: ${colors.rotorkGrey};">
+                                    "Customers are increasingly complaining about slow loading times and frequent errors on the company's e-commerce website, especially during peak shopping hours (evenings from 6 PM to 10 PM and weekends). This issue is primarily affecting users attempting to add items to their cart or proceed to checkout. The company's internal analytics show a 15% increase in abandoned carts over the last quarter and a 5% drop in overall sales conversion rates. The IT support team is overwhelmed with a 30% surge in tickets related to website performance, leading to longer resolution times and frustrated customers. This directly impacts revenue and customer loyalty."
+                                </p>
+                            </div>
+
+                            <div class="mt-8 space-y-4">
+                                ${scenarioInputsHtml}
+                            </div>
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('cant-answer-questions')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                                <button onclick="navigateTo('quiz')" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                    Next: Take the Quiz!
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    contentArea.innerHTML = sectionContent;
+                    break;
+
+                case 'quiz':
+                    let quizHtml = '';
+                    quizQuestions.forEach(q => {
+                        let optionsHtml = '';
+                        q.options.forEach(option => {
+                            const isChecked = quizAnswers[q.id] === option;
+                            const isDisabled = quizSubmitted ? 'disabled' : '';
+                            let feedbackSpan = '';
+                            if (quizSubmitted && quizAnswers[q.id] === option && quizAnswers[q.id] !== q.correctAnswer) {
+                                feedbackSpan = '<span class="ml-2 text-red-600">❌ Incorrect</span>';
+                            } else if (quizSubmitted && option === q.correctAnswer) {
+                                feedbackSpan = '<span class="ml-2 text-green-600">✅ Correct</span>';
+                            }
+
+                            optionsHtml += `
+                                <label class="flex items-center cursor-pointer" style="color: ${colors.rotorkGrey};">
+                                    <input
+                                        type="radio"
+                                        name="${q.id}"
+                                        value="${option}"
+                                        ${isChecked ? 'checked' : ''}
+                                        ${isDisabled}
+                                        onchange="handleQuizChange(event)"
+                                        class="form-radio h-5 w-5"
+                                        style="accent-color: ${colors.rotorkBlue};"
+                                    />
+                                    <span class="ml-3 text-base">${option}</span>
+                                    ${feedbackSpan}
+                                </label>
+                            `;
+                        });
+
+                        quizHtml += `
+                            <div class="p-6 rounded-lg shadow-sm border" style="background-color: ${colors.rotorkLightGrey}; border-color: ${colors.rotorkGrey + '40'};">
+                                <p class="text-lg font-semibold mb-4" style="color: ${colors.rotorkDarkBlue};">${q.id}. ${q.question}</p>
+                                <div class="space-y-3">
+                                    ${optionsHtml}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    let quizButtonsHtml = '';
+                    if (!quizSubmitted) {
+                        quizButtonsHtml = `
+                            <button onclick="handleSubmitQuiz()" class="px-8 py-4 text-white font-bold text-xl rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkGreen};">
+                                Submit Quiz
+                            </button>
+                        `;
+                    } else {
+                        let passFailMessage = '';
+                        if (score / quizQuestions.length >= 0.8) {
+                            passFailMessage = `<p class="text-xl font-semibold mb-4" style="color: ${colors.rotorkGreen};">Congratulations! You passed!</p>`;
+                            if (!showCertificateInput) {
+                                quizButtonsHtml += `
+                                    <button onclick="showCertificateInput = true; renderSection();" class="px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkPurple};">
+                                        Generate Certificate
+                                    </button>
+                                `;
+                            }
+                        } else {
+                            passFailMessage = `<p class="text-xl font-semibold mb-4" style="color: ${colors.rotorkRed};">You did not pass. Please review the module and try again.</p>`;
+                        }
+                        quizButtonsHtml = `
+                            <div class="text-center">
+                                <p class="text-2xl font-bold mb-4" style="color: ${colors.rotorkDarkBlue};">Your Score: ${score} / ${quizQuestions.length}</p>
+                                ${passFailMessage}
+                                ${quizButtonsHtml} <button onclick="resetQuiz()" class="mt-4 px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkBlue};">
+                                    Retake Quiz
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    let certificateInputHtml = '';
+                    if (showCertificateInput && score / quizQuestions.length >= 0.8) {
+                        certificateInputHtml = `
+                            <div class="mt-8 p-6 rounded-lg shadow-md" style="background-color: ${colors.rotorkYellow + '1A'}; border: 1px solid ${colors.rotorkYellow};">
+                                <h3 class="text-xl font-semibold mb-4" style="color: ${colors.rotorkDarkBlue};">Enter Your Name for the Certificate:</h3>
+                                <input
+                                    type="text"
+                                    value="${certificateName}"
+                                    oninput="certificateName = this.value; renderSection();"
+                                    class="block w-full px-4 py-2 border rounded-md shadow-sm sm:text-sm"
+                                    style="border-color: ${colors.rotorkGrey}; color: ${colors.rotorkGrey};"
+                                    placeholder="Your Full Name"
+                                />
+                                <button
+                                    onclick="navigateTo('certificate')"
+                                    ${certificateName.trim() === '' ? 'disabled' : ''}
+                                    class="mt-4 px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 ${certificateName.trim() === '' ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    style="background-color: ${colors.rotorkYellow};"
+                                >
+                                    View Certificate
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    sectionContent = `
+                        <div class="space-y-6">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Problem Statement Quiz</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                Test your knowledge! You need to get at least 80% correct to pass and earn your certificate.
+                            </p>
+                            ${quizHtml}
+                            <div class="mt-8 flex justify-center">
+                                ${quizButtonsHtml}
+                            </div>
+                            ${certificateInputHtml}
+                            <div class="flex justify-between mt-8">
+                                <button onclick="navigateTo('scenario-writing')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    contentArea.innerHTML = sectionContent;
+                    break;
+
+                case 'certificate':
+                    sectionContent = `
+                        <div class="space-y-6 flex flex-col items-center">
+                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Certificate of Completion</h2>
+                            <div class="border-4 p-10 rounded-xl shadow-2xl bg-white text-center w-full max-w-2xl" style="border-color: ${colors.rotorkBlue};">
+                                <img
+                                    src="download (5).png"
+                                    alt="Rotork Logo"
+                                    class="mx-auto mb-6 h-20 object-contain"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/150x50/FFFFFF/000000?text=Rotork';"
+                                />
+                                <p class="text-xl font-semibold mb-4" style="color: ${colors.rotorkGrey};">This certifies that</p>
+                                <p class="text-5xl font-extrabold mb-6 font-serif" style="color: ${colors.rotorkDarkBlue};">${certificateName || 'Participant'}</p>
+                                <p class="text-xl font-semibold mb-4" style="color: ${colors.rotorkGrey};">has successfully completed the</p>
+                                <p class="text-4xl font-bold mb-8" style="color: ${colors.rotorkGreen};">Problem Statement Training Module</p>
+                                <p class="text-lg" style="color: ${colors.rotorkGrey};">on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                <div class="mt-8 text-right">
+                                    <p class="text-lg font-semibold" style="color: ${colors.rotorkGrey};">Scott Emmerson</p>
+                                    <p class="text-md" style="color: ${colors.rotorkGrey};">Engineering Manager</p>
+                                </div>
+                            </div>
+                            <button onclick="navigateTo('intro')" class="mt-8 px-6 py-3 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                                Return to Start
+                            </button>
+                        </div>
+                    `;
+                    contentArea.innerHTML = sectionContent;
+                    break;
+
+                default:
+                    contentArea.innerHTML = `<p style="color: ${colors.rotorkRed};">Error: Section not found.</p>`;
+            }
+        }
+
+        function resetQuiz() {
+            quizSubmitted = false;
+            quizAnswers = {};
+            score = 0;
+            showCertificateInput = false;
+            certificateName = '';
+            renderSection();
+        }
+
+        // Initial render when the page loads
+        window.onload = renderSection;
+
+    </script>
+</body>
+</html>
