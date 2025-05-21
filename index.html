@@ -25,13 +25,13 @@
         /* Ensure consistent bullet point alignment */
         ul {
             list-style-type: disc; /* Use default disc bullet */
-            list-style-position: inside; /* Place bullet inside the content flow */
-            padding-left: 1.5rem; /* Overall indentation of the list from the left edge */
+            list-style-position: outside; /* Crucial for hanging indent */
+            padding-left: 2rem; /* Adjust this value to control overall list indentation from the left */
+            margin: 0; /* Reset default margin */
         }
         li {
             margin-bottom: 0.5rem; /* Space between list items */
-            text-indent: -1.5em; /* Pull the first line (including bullet) back by the bullet width + some space */
-            padding-left: 1.5em; /* Push the entire content (including wrapped lines) to the right */
+            /* No specific padding-left or text-indent here, let list-style-position: outside handle the hanging indent */
         }
         /* Ensure strong tag within li doesn't cause extra indentation */
         li strong {
@@ -42,14 +42,18 @@
 <body>
     <div id="app" class="min-h-screen">
         <div class="container mx-auto p-8 max-w-4xl bg-white shadow-lg rounded-lg my-10">
-            <div class="flex justify-center mb-8">
+            <header class="flex items-center justify-between mb-8 p-4 bg-white rounded-lg shadow-sm">
                 <img
                     src="download (5).png"
                     alt="Rotork Logo"
-                    class="h-12 object-contain"
+                    class="h-16 object-contain"
                     onerror="this.onerror=null; this.src='https://placehold.co/150x50/FFFFFF/000000?text=Rotork';"
                 />
-            </div>
+                <h1 class="text-2xl md:text-3xl font-bold text-right" style="color: #004D73;">
+                    Problem Statement Training Module
+                </h1>
+            </header>
+
             <div id="content-area">
                 </div>
         </div>
@@ -647,7 +651,7 @@
                 case 'intro':
                     sectionContent = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Welcome to the Problem Statement Training Module!</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">Welcome to the Problem Statement Training Module!</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 Understanding and clearly defining a problem is the crucial first step towards finding effective solutions. This module will guide you through the essential concepts and tools for crafting impactful problem statements.
                             </p>
@@ -665,14 +669,14 @@
                 case 'importance':
                     sectionContent = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Why Problem Statements Are Important</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">Why Problem Statements Are Important</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 A problem statement is a concise description of an issue that needs to be addressed. It clearly articulates the gap between the current state and the desired state, without suggesting a solution. It defines the problem, its impact, and who is affected, serving as a foundation for problem-solving efforts.
                             </p>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 A well-crafted problem statement acts as a compass, guiding all subsequent efforts in problem-solving. Without it, you risk:
                             </p>
-                            <ul class="list-disc text-lg" style="color: ${colors.rotorkGrey}; margin-left: 1.5rem;">
+                            <ul class="text-lg" style="color: ${colors.rotorkGrey};">
                                 <li><strong>Misunderstanding the Root Cause:</strong> Leading to superficial solutions that don't address the core issue.</li>
                                 <li><strong>Wasted Resources:</strong> Investing time, money, and effort into solving the wrong problem.</li>
                                 <li><strong>Lack of Alignment:</strong> Teams working on different interpretations of the problem, leading to inefficiency.</li>
@@ -696,44 +700,37 @@
                     break;
 
                 case 'problem-ladder':
-                    const ladderSteps = [
-                        { label: "HOW is it a Problem?", color: colors.rotorkPurple },
-                        { label: "WHY is it a Problem?", color: colors.rotorkOrange },
-                        { label: "WHEN Does the Problem Occur?", color: colors.rotorkTeal },
-                        { label: "WHO is Affected?", color: colors.rotorkBlue },
-                        { label: "WHERE is the Problem?", color: colors.rotorkYellow },
-                        { label: "WHAT is the Problem?", color: colors.rotorkRed },
-                    ];
+                    // Removed ladderSteps array as it's now an image
                     sectionContent = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">The Concept of the Problem Ladder</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">The Concept of the Problem Ladder</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
-                                The Problem Ladder is a conceptual tool designed to help you build an effective problem statement by starting at the foundational level and working your way up. You begin by defining "WHAT" the problem is, and then progressively answer the other 5 W's and 1 H, ascending the ladder to a comprehensive understanding.
+                                The Problem Ladder is a conceptual tool that helps you build an effective problem statement by starting at the foundational level and working your way up. Each step on the ladder represents a crucial question that, when answered, builds a more complete and actionable problem statement.
                             </p>
 
                             <div class="flex justify-center my-8">
-                                <div class="relative flex flex-col items-center py-4 px-2 bg-gray-200 rounded-lg shadow-xl" style="width: 250px; height: ${ladderSteps.length * 55 + 80}px; background-color: ${colors.rotorkLightGrey};">
-                                    <div class="absolute left-2 top-0 bottom-0 w-3 rounded-full" style="background-color: ${colors.rotorkGrey};"></div>
-                                    <div class="absolute right-2 top-0 bottom-0 w-3 rounded-full" style="background-color: ${colors.rotorkGrey};"></div>
-
-                                    <div class="absolute top-4 flex items-center justify-center w-56 h-12 text-white font-bold text-base rounded-lg shadow-md z-10"
-                                        style="background: linear-gradient(to right, ${colors.rotorkBlue}, ${colors.rotorkDarkBlue});">
-                                        Effective Problem Statement
-                                    </div>
-                                    ${ladderSteps.map((step, index) => `
-                                        <div
-                                            class="absolute flex items-center justify-center w-56 h-10 text-white font-semibold rounded-md shadow-sm z-10"
-                                            style="bottom: ${20 + (ladderSteps.length - 1 - index) * 55}px; background-color: ${step.color};"
-                                        >
-                                            ${step.label}
-                                        </div>
-                                    `).join('')}
-                                </div>
+                                <img
+                                    src="Ladder.jpg"
+                                    alt="Problem Ladder Diagram"
+                                    class="max-w-xs md:max-w-sm lg:max-w-md object-contain rounded-lg shadow-xl"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/300x500/F0F0F0/6B7B8D?text=Problem+Ladder';"
+                                />
                             </div>
 
-                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
-                                Each step on the ladder represents a crucial question that, when answered, builds a more complete and actionable problem statement. By systematically addressing these elements, you ensure a thorough understanding of the problem before seeking solutions.
-                            </p>
+                            <div class="space-y-4 mt-6">
+                                <h3 class="text-xl font-bold" style="color: ${colors.rotorkDarkBlue};">Understanding Each Rung:</h3>
+                                <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                    Each rung of the Problem Ladder represents a key question to fully define your problem:
+                                </p>
+                                <ul class="text-lg" style="color: ${colors.rotorkGrey};">
+                                    <li><strong>WHAT is the Problem?:</strong> Define the core observable issue. What exactly is going wrong? (e.g., "Customer complaints about product defects increased by 20%").</li>
+                                    <li><strong>WHERE is the Problem?:</strong> Pinpoint the specific location or context. Where does it occur? (e.g., "In the assembly line, specifically station 3").</li>
+                                    <li><strong>WHO is Affected?:</strong> Identify all stakeholders impacted. Who is experiencing or suffering from this problem? (e.g., "End users, quality control team, and the company's reputation").</li>
+                                    <li><strong>WHEN Does the Problem Occur?:</strong> Understand the timing or frequency. Is it constant, intermittent, or tied to specific events? (e.g., "During night shifts and after software updates").</li>
+                                    <li><strong>WHY is it a Problem?:</strong> Quantify the impact and consequences. What are the negative effects if this problem isn't solved? (e.g., "Leads to $50,000 in monthly rework costs and decreased customer retention").</li>
+                                    <li><strong>HOW is it a Problem?:</strong> Describe the mechanism or process, including supporting data. How does it happen, and what evidence supports it? (e.g., "Due to outdated machinery leading to misalignment, evidenced by daily inspection reports showing increased defect rates").</li>
+                                </ul>
+                            </div>
                             <div class="flex justify-between mt-8">
                                 <button onclick="navigateTo('importance')" class="px-6 py-3 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkLightGrey};">
                                     Back
@@ -770,7 +767,7 @@
                     `;
                     contentArea.innerHTML = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">What is the Problem?</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">What is the Problem?</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 This is the foundational element of your problem statement. It requires a precise, objective, and observable description of the issue. Focus on the facts and avoid jumping to conclusions or solutions. What exactly is going wrong? What is the current undesirable situation? Be specific and quantifiable where possible. For example, instead of "sales are bad," specify "sales have decreased by 15% in Q1."
                             </p>
@@ -805,7 +802,7 @@
                     };
                     contentArea.innerHTML = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Where is the Problem?</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">Where is the Problem?</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 Pinpointing the location or specific context of the problem helps narrow down the scope and identify potential areas for investigation. This could be a department, a system, a product line, or a geographical region. It prevents you from trying to solve a global problem when it's actually localized.
                             </p>
@@ -847,7 +844,7 @@
                     `;
                     contentArea.innerHTML = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Who is Affected?</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">Who is Affected?</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 Understanding "Who" is affected by the problem is crucial for building empathy and ensuring your solution addresses the needs of all relevant stakeholders. This includes direct users, customers, employees (across various departments), management, partners, and even the broader business or community. Consider both those directly experiencing the problem and those impacted by its ripple effects.
                             </p>
@@ -873,7 +870,7 @@
                     `;
                     contentArea.innerHTML = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">When Does the Problem Occur?</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">When Does the Problem Occur?</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 Understanding the timing or frequency of the problem helps reveal patterns, triggers, and potential peak periods. Is it a constant issue, or does it occur intermittently? Is it seasonal, tied to specific events (like system updates or marketing campaigns), or does it happen at particular times of day or week? Identifying the timing can provide critical clues about root causes and potential intervention points.
                             </p>
@@ -894,13 +891,13 @@
                 case 'why-is-problem':
                     const whyItems = [
                         "Loss of revenue",
-                        "Decreased customer loyalty",
-                        "Increased operational costs",
-                        "Improved employee morale",
-                        "Damaged brand reputation",
-                        "Faster coffee machine",
-                        "Reduced market share",
-                        "Compliance risks"
+                    "Decreased customer loyalty",
+                    "Increased operational costs",
+                    "Improved employee morale",
+                    "Damaged brand reputation",
+                    "Faster coffee machine",
+                    "Reduced market share",
+                    "Compliance risks"
                     ];
                     const whyCorrectItems = [
                         "Loss of revenue",
@@ -918,7 +915,7 @@
                     `;
                     contentArea.innerHTML = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Why is it a Problem (to business or customer)?</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">Why is it a Problem (to business or customer)?</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 This section quantifies the impact and articulates the negative consequences if the problem is not solved. Why does this problem matter? What are the tangible and intangible costs to the business or the customer? Think about financial losses, decreased productivity, damaged reputation, reduced customer satisfaction, missed opportunities, increased risk, or negative environmental/social impact. This helps justify the need for a solution.
                             </p>
@@ -954,7 +951,7 @@
                     };
                     contentArea.innerHTML = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">How is it a Problem?</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">How is it a Problem?</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 This delves into the mechanism or process through which the problem manifests. It describes the chain of events, the specific steps, or the underlying conditions that cause the problem to occur and lead to its impact. It's about understanding the "how-it-works" of the problem. This section also incorporates "What is the Data?", referring to the objective evidence that validates the existence and quantifies the impact. Data makes your problem statement credible and measurable.
                             </p>
@@ -975,14 +972,14 @@
                 case 'cant-answer-questions':
                     sectionContent = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">What Happens When You Can't Answer the Questions?</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">What Happens When You Can't Answer the Questions?</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 If you struggle to answer the 5 W's and 1 H, it's a strong indicator that you don't fully understand the problem. This is not a failure, but an opportunity for further investigation. It means you need to gather more information before you can effectively define the problem and seek a solution.
                             </p>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 Consequences of an unclear problem statement include:
                             </p>
-                            <ul class="list-disc text-lg" style="color: ${colors.rotorkGrey}; margin-left: 1.5rem;">
+                            <ul class="text-lg" style="color: ${colors.rotorkGrey};">
                                 <li><strong>Ineffective Solutions:</strong> You might solve a symptom, not the root cause, leading to recurring issues.</li>
                                 <li><strong>Scope Creep:</strong> The problem-solving effort expands unnecessarily because the boundaries of the problem are ill-defined.</li>
                                 <li><strong>Lack of Buy-in:</strong> Stakeholders won't commit to a solution if they don't clearly grasp the problem or its importance.</li>
@@ -991,11 +988,11 @@
                                 <li><strong>Delayed Progress:</strong> Constant rework, debates, and redirection due to an unclear starting point and shifting objectives.</li>
                             </ul>
 
-                            <h3 class="text-2xl font-bold mt-8" style="color: ${colors.rotorkDarkBlue};">What You Can Do: Problem-Solving Techniques</h3>
+                            <h3 class="text-xl font-bold mt-8" style="color: ${colors.rotorkDarkBlue};">What You Can Do: Problem-Solving Techniques</h3>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 When faced with an unclear problem, leverage these techniques to gain deeper understanding:
                             </p>
-                            <ul class="list-disc text-lg" style="color: ${colors.rotorkGrey}; margin-left: 1.5rem;">
+                            <ul class="text-lg" style="color: ${colors.rotorkGrey};">
                                 <li><strong>5 Whys:</strong> A simple yet powerful technique. Start with the problem and ask "Why?" five times (or as many times as needed) to drill down to the root cause. Each answer forms the basis for the next "Why?" question.</li>
                                 <li><strong>Fishbone Diagram (Ishikawa Diagram):</strong> A visual tool used to explore and identify the potential causes of a problem. It categorizes potential causes into main branches (e.g., People, Process, Equipment, Environment, Materials, Management), allowing for a structured brainstorming of contributing factors.</li>
                                 <li><strong>Mind Mapping:</strong> A visual thinking tool that helps organize information, brainstorm ideas, and explore concepts. For problem statements, you can put the central problem in the middle and branch out with related questions, sub-problems, potential causes, and data points.</li>
@@ -1042,7 +1039,7 @@
 
                     sectionContent = `
                         <div class="space-y-6">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Scenario Analysis: Practice Your Skills!</h2>
+                            <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">Scenario Analysis: Practice Your Skills!</h2>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 Read the following scenario carefully and then use the input boxes below to identify the What, Where, Who, When, Why, and How related to the problem described. Remember to consider any data mentioned as part of the 'How'.
                             </p>
