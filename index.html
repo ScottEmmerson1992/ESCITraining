@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Problem Statement Training Module</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body {
@@ -46,13 +47,17 @@
                 <img
                     src="download (5).png"
                     alt="Rotork Logo"
-                    class="h-16 object-contain"
+                    class="h-32 object-contain"
                     onerror="this.onerror=null; this.src='https://placehold.co/150x50/FFFFFF/000000?text=Rotork';"
                 />
                 <h1 class="text-2xl md:text-3xl font-bold text-right" style="color: #004D73;">
                     Problem Statement Training Module
                 </h1>
             </header>
+
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8 overflow-hidden">
+                <div id="progress-bar" class="h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 0%; background-color: #669933;"></div>
+            </div>
 
             <div id="content-area">
                 </div>
@@ -91,6 +96,13 @@
         let score = 0;
         let certificateName = '';
         let showCertificateInput = false;
+
+        // Order of sections for progress bar calculation (excluding intro and certificate)
+        const learningSectionOrder = [
+            'importance', 'problem-ladder', 'what-is-problem', 'where-is-problem', 'who-is-affected',
+            'when-does-problem-occur', 'why-is-problem', 'how-is-problem', 'cant-answer-questions',
+            'scenario-writing', 'quiz'
+        ];
 
         // Quiz questions with correct answers
         const quizQuestions = [
@@ -647,11 +659,27 @@
 
             let sectionContent;
 
+            // Calculate progress
+            const currentSectionIndex = learningSectionOrder.indexOf(currentSection);
+            const progressBar = document.getElementById('progress-bar');
+            if (progressBar) { // Check if progressBar exists before trying to update
+                if (currentSectionIndex !== -1) {
+                    const progressPercentage = ((currentSectionIndex + 1) / learningSectionOrder.length) * 100;
+                    progressBar.style.width = `${progressPercentage}%`;
+                } else {
+                    progressBar.style.width = '0%'; // For intro and certificate sections
+                }
+            }
+
+
             switch (currentSection) {
                 case 'intro':
                     sectionContent = `
                         <div class="space-y-6">
                             <h2 class="text-2xl font-bold" style="color: ${colors.rotorkDarkBlue};">Welcome to the Problem Statement Training Module!</h2>
+                            <p class="text-lg" style="color: ${colors.rotorkGrey};">
+                                This module is designed to take approximately <strong>1 hour</strong> to complete.
+                            </p>
                             <p class="text-lg" style="color: ${colors.rotorkGrey};">
                                 Understanding and clearly defining a problem is the crucial first step towards finding effective solutions. This module will guide you through the essential concepts and tools for crafting impactful problem statements.
                             </p>
@@ -710,7 +738,7 @@
 
                             <div class="flex justify-center my-8">
                                 <img
-                                    src="Ladder.jpg"
+                                    src="Problem Ladder.png"
                                     alt="Problem Ladder Diagram"
                                     class="max-w-xs md:max-w-sm lg:max-w-md object-contain rounded-lg shadow-xl"
                                     onerror="this.onerror=null; this.src='https://placehold.co/300x500/F0F0F0/6B7B8D?text=Problem+Ladder';"
@@ -1044,9 +1072,9 @@
                                 Read the following scenario carefully and then use the input boxes below to identify the What, Where, Who, When, Why, and How related to the problem described. Remember to consider any data mentioned as part of the 'How'.
                             </p>
                             <div class="p-6 rounded-lg shadow-inner border-l-4" style="background-color: ${colors.rotorkLightGrey}; border-color: ${colors.rotorkBlue};">
-                                <h3 class="text-xl font-semibold" style="color: ${colors.rotorkDarkBlue};">Scenario: E-commerce Website Performance</h3>
+                                <h3 class="text-xl font-semibold" style="color: ${colors.rotorkDarkBlue};">Scenario: Engineering Support Efficiency</h3>
                                 <p style="color: ${colors.rotorkGrey};">
-                                    "Customers are increasingly complaining about slow loading times and frequent errors on the company's e-commerce website, especially during peak shopping hours (evenings from 6 PM to 10 PM and weekends). This issue is primarily affecting users attempting to add items to their cart or proceed to checkout. The company's internal analytics show a 15% increase in abandoned carts over the last quarter and a 5% drop in overall sales conversion rates. The IT support team is overwhelmed with a 30% surge in tickets related to website performance, leading to longer resolution times and frustrated customers. This directly impacts revenue and customer loyalty."
+                                    "The Engineering Support team is experiencing significant delays in resolving technical queries from the factory floor and sales teams, particularly for older product lines. This often leads to production slowdowns and missed sales opportunities. The current process for escalating issues to design engineers is fragmented, relying heavily on informal communication channels and manual tracking in spreadsheets. This results in critical information being lost or delayed, especially when multiple departments are involved. Data shows that the average resolution time for complex factory issues has increased by 35% over the last six months, leading to a 10% reduction in factory output efficiency. Sales team feedback indicates frustration due to slow responses impacting customer commitments. Furthermore, new product development cycles are being impacted as design engineers are frequently pulled away to address these urgent support issues, delaying innovation and product launch timelines."
                                 </p>
                             </div>
 
@@ -1187,14 +1215,27 @@
                     break;
 
                 case 'certificate':
+                    // Function to trigger PDF download
+                    window.downloadCertificateAsPdf = function() {
+                        const certificateElement = document.getElementById('certificate-content');
+                        // Options for PDF generation
+                        const options = {
+                            margin: 10,
+                            filename: 'Problem_Statement_Certificate.pdf',
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                        };
+                        html2pdf().from(certificateElement).set(options).save();
+                    };
+
                     sectionContent = `
                         <div class="space-y-6 flex flex-col items-center">
-                            <h2 class="text-3xl font-bold" style="color: ${colors.rotorkDarkBlue};">Certificate of Completion</h2>
-                            <div class="border-4 p-10 rounded-xl shadow-2xl bg-white text-center w-full max-w-2xl" style="border-color: ${colors.rotorkBlue};">
+                            <div id="certificate-content" class="border-4 p-10 rounded-xl shadow-2xl bg-white text-center w-full max-w-2xl" style="border-color: ${colors.rotorkBlue};">
                                 <img
                                     src="download (5).png"
                                     alt="Rotork Logo"
-                                    class="mx-auto mb-6 h-20 object-contain"
+                                    class="mx-auto mb-6 h-40 object-contain"
                                     onerror="this.onerror=null; this.src='https://placehold.co/150x50/FFFFFF/000000?text=Rotork';"
                                 />
                                 <p class="text-xl font-semibold mb-4" style="color: ${colors.rotorkGrey};">This certifies that</p>
@@ -1207,7 +1248,10 @@
                                     <p class="text-md" style="color: ${colors.rotorkGrey};">Engineering Manager</p>
                                 </div>
                             </div>
-                            <button onclick="navigateTo('intro')" class="mt-8 px-6 py-3 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
+                            <button onclick="downloadCertificateAsPdf()" class="mt-8 px-6 py-3 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkBlue};">
+                                Download as PDF
+                            </button>
+                            <button onclick="navigateTo('intro')" class="mt-4 px-6 py-3 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105" style="background-color: ${colors.rotorkRed};">
                                 Return to Start
                             </button>
                         </div>
